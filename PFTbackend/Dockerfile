@@ -25,7 +25,7 @@ FROM php:8.2-fpm-alpine AS runtime
 # Install Nginx and PHP extensions
 RUN apk add --no-cache nginx bash git unzip libzip-dev libpng-dev libxml2-dev oniguruma-dev curl \
     && docker-php-ext-install pdo pdo_mysql zip bcmath \
-    && mkdir -p /run/nginx
+    && mkdir -p /run/nginx /var/www/html
 
 WORKDIR /var/www/html
 
@@ -33,15 +33,16 @@ WORKDIR /var/www/html
 COPY --from=vendor /app ./
 COPY --from=frontend /app/public/build ./public/build
 
-# Copy your Nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy your Nginx config (ensure this file exists in your repo)
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-# Permissions
+# Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Expose the port Render expects
+# Render automatically assigns a port number via the $PORT environment variable
+# Expose 80 for local dev compatibility
 EXPOSE 80
 
-# Start both PHP-FPM and Nginx together
+# Start both PHP-FPM and Nginx (foreground mode)
 CMD php-fpm & nginx -g 'daemon off;'
