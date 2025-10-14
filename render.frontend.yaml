@@ -1,0 +1,11 @@
+
+# Render service for React frontend (Static site)
+staticSites:
+  - name: pft-frontend
+    env: node
+    buildCommand: npm install && npm run build
+    publishPath: /public
+    plan: starter
+    envVars:
+      - key: VITE_API_URL
+        value: https://your-backend.onrender.com

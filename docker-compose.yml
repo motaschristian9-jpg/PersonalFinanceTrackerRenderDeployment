@@ -1,0 +1,91 @@
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: pft_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: pftdatabase
+      MYSQL_USER: pftuser
+      MYSQL_PASSWORD: pftpassword
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  php:
+    build:
+      context: ./PFTbackend
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: pft_php
+    restart: always
+    environment:
+      APP_ENV: production
+      APP_DEBUG: false
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: pftdatabase
+      DB_USERNAME: pftuser
+      DB_PASSWORD: pftpassword
+    working_dir: /var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: pft_nginx
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./PFTbackend:/var/www/html
+      - ./PFTbackend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+    networks:
+      - backend
+
+  frontend:
+    build:
+      context: ./PFTfrontend
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: pft_frontend
+    restart: always
+    ports:
+      - "5173:80"
+    networks:
+      - backend
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pft_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - backend
+
+volumes:
+  db_data:
+
+networks:
+  backend:
+    driver: bridge
