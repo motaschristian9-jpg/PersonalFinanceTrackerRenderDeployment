@@ -22,8 +22,8 @@ RUN npm run build
 # ---------- Stage 3: Runtime (Nginx + PHP-FPM) ----------
 FROM php:8.2-fpm-alpine AS runtime
 
-# Install Nginx and PHP extensions
-RUN apk add --no-cache nginx bash git unzip libzip-dev libpng-dev libxml2-dev oniguruma-dev curl \
+# Install Nginx, PHP extensions, and envsubst (gettext)
+RUN apk add --no-cache nginx bash git unzip libzip-dev libpng-dev libxml2-dev oniguruma-dev curl gettext \
     && docker-php-ext-install pdo pdo_mysql zip bcmath \
     && mkdir -p /run/nginx /var/www/html
 
@@ -33,19 +33,18 @@ WORKDIR /var/www/html
 COPY --from=vendor /app ./
 COPY --from=frontend /app/public/build ./public/build
 
-# Copy your Nginx config (ensure this file exists in your repo)
+# Copy Nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
-
-
 
 # Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Render automatically assigns a port number via the $PORT environment variable
-# Expose 80 for local dev compatibility
+# Render automatically assigns a port via $PORT
 EXPOSE 80
 
-# Start both PHP-FPM and Nginx (foreground mode)
-CMD php-fpm & envsubst '\$PORT' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp && mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf && nginx -g 'daemon off;'
-
+# Start both PHP-FPM and Nginx with envsubst for dynamic port
+CMD php-fpm & \
+    envsubst '\$PORT' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp && \
+    mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf && \
+    nginx -g 'daemon off;'
