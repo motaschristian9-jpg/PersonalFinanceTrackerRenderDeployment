@@ -34,7 +34,7 @@ COPY --from=vendor /app ./
 COPY --from=frontend /app/public/build ./public/build
 
 # Copy your Nginx config
-COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
