@@ -34,7 +34,8 @@ COPY --from=vendor /app ./
 COPY --from=frontend /app/public/build ./public/build
 
 # Copy your Nginx config (ensure this file exists in your repo)
-COPY nginx.conf /etc/nginx/conf.d/app.conf
+COPY nginx.conf /etc/nginx/nginx.conf
+
 
 
 # Set permissions
