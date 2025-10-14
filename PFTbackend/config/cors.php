@@ -7,13 +7,13 @@ $allowed_origins = is_string($frontend) && strpos($frontend, ',') !== false
     : [$frontend];
 
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie'], // routes to allow CORS on
-
-    'allowed_methods' => ['*'],                  // all HTTP methods
-    'allowed_origins' => $allowed_origins,       // dynamically allow origins
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'allowed_methods' => ['*'],
+    'allowed_origins' => $allowed_origins,
     'allowed_origins_patterns' => [],
-    'allowed_headers' => ['*'],                  // allow all headers
+    'allowed_headers' => ['*'],
     'exposed_headers' => [],
     'max_age' => 0,
-    'supports_credentials' => true,             // allow cookies / auth
+    'supports_credentials' => true,
 ];
+
