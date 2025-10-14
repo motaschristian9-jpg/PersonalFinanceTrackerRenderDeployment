@@ -1,12 +1,13 @@
 <?php
 
+// Read FRONTEND_URL from .env, support multiple origins separated by commas
 $frontend = env('FRONTEND_URL', '*');
 $allowed_origins = is_string($frontend) && strpos($frontend, ',') !== false
     ? array_map('trim', explode(',', $frontend))
     : [$frontend];
 
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie', '*'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
