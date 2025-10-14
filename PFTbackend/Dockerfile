@@ -47,4 +47,5 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 EXPOSE 80
 
 # Start both PHP-FPM and Nginx (foreground mode)
-CMD php-fpm & nginx -g 'daemon off;'
+CMD php-fpm & envsubst '\$PORT' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp && mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf && nginx -g 'daemon off;'
+
