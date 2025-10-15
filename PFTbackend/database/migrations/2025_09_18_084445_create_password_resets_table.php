@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('password_resets', function (Blueprint $table) {
-            $table->string('email')->index();
+            $table->string('email')->primary();   // primary key added for Aiven
             $table->string('token', 60);
             $table->timestamp('created_at')->nullable();
         });
