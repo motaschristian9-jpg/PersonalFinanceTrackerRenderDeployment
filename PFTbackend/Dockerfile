@@ -6,9 +6,8 @@ RUN apk add --no-cache git unzip libzip-dev curl bash \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 WORKDIR /app
-COPY . .
+COPY . . 
 RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-
 
 # ---------- Stage 2: Node Build for Frontend (Vite) ----------
 FROM node:20-alpine AS frontend
@@ -17,7 +16,6 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
-
 
 # ---------- Stage 3: Runtime (Nginx + PHP-FPM) ----------
 FROM php:8.2-fpm-alpine AS runtime
@@ -30,7 +28,7 @@ RUN apk add --no-cache nginx bash git unzip libzip-dev libpng-dev libxml2-dev on
 WORKDIR /var/www/html
 
 # Copy Laravel app and built assets
-COPY --from=vendor /app ./
+COPY --from=vendor /app ./ 
 COPY --from=frontend /app/public/build ./public/build
 
 # Copy Nginx configuration
@@ -43,8 +41,9 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 # Render automatically assigns a port via $PORT
 EXPOSE 80
 
-# Start both PHP-FPM and Nginx with envsubst for dynamic port
-CMD php-fpm & \
+# Start PHP-FPM, run migrations, then start Nginx
+CMD php artisan migrate --force && \
+    php-fpm & \
     envsubst '\$PORT' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp && \
     mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf && \
     nginx -g 'daemon off;'
