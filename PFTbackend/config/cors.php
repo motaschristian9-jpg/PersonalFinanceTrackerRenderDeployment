@@ -1,13 +1,14 @@
 <?php
 
 return [
-    'paths' => ['api/*'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
         'https://moneytracker2025-4qj5.onrender.com',
-        'http://localhost:5174'
+        'http://localhost:5173',
+        'http://localhost:5174',
     ],
 
     'allowed_origins_patterns' => [],
@@ -18,5 +19,5 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false, // false for JWT in headers
+    'supports_credentials' => false,
 ];
