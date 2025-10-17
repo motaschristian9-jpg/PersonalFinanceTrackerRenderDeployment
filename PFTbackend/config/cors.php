@@ -7,7 +7,7 @@ return [
 
     'allowed_origins' => [
         'https://moneytracker2025-4qj5.onrender.com',
-        'http://localhost:5173'
+        'http://localhost:5174'
     ],
 
     'allowed_origins_patterns' => [],

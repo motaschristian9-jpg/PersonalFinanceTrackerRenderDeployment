@@ -34,7 +34,7 @@ class ForgotPasswordController extends Controller
         );
 
         // Generate the React frontend reset URL
-        $resetUrl = "http://localhost:5173/reset-password?token={$token}&email={$request->email}";
+        $resetUrl = "https://moneytracker2025-4qj5.onrender.com/reset-password?token={$token}&email={$request->email}";
 
         // Send email manually
         Mail::send('emails.reset-password', ['url' => $resetUrl], function ($message) use ($request) {
